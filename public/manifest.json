@@ -1,0 +1,93 @@
+{
+  "name": "Ditto X 25 - Digital Programme",
+  "short_name": "Ditto X 25",
+  "description": "Official digital programme for Ditto X 2025 at The O2 Arena, London",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#070707",
+  "theme_color": "#00ff99",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "https://cdn.prod.website-files.com/655e0fa544c67c1ee5ce01a4/68fb8401567be091ffe4065e_Android%20Home%20Screen.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn.prod.website-files.com/655e0fa544c67c1ee5ce01a4/68fb8402a33c6fd677ab813f_Android%20Splash%20Screen.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn.prod.website-files.com/655e0fa544c67c1ee5ce01a4/68fb840163eb1687421231f6_ios%20home%20screen.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["music", "entertainment", "events"],
+  "screenshots": [
+    {
+      "src": "/screenshots/schedule.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "label": "Event Schedule"
+    },
+    {
+      "src": "/screenshots/map.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "label": "Venue Map"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Schedule",
+      "short_name": "Schedule",
+      "description": "View event schedule",
+      "url": "/?page=schedule",
+      "icons": [
+        {
+          "src": "https://cdn.prod.website-files.com/655e0fa544c67c1ee5ce01a4/68fb8401567be091ffe4065e_Android%20Home%20Screen.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "My Agenda",
+      "short_name": "Agenda",
+      "description": "View saved sessions",
+      "url": "/?page=agenda",
+      "icons": [
+        {
+          "src": "https://cdn.prod.website-files.com/655e0fa544c67c1ee5ce01a4/68fb8401567be091ffe4065e_Android%20Home%20Screen.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Venue Map",
+      "short_name": "Map",
+      "description": "View venue maps",
+      "url": "/?page=map",
+      "icons": [
+        {
+          "src": "https://cdn.prod.website-files.com/655e0fa544c67c1ee5ce01a4/68fb8401567be091ffe4065e_Android%20Home%20Screen.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "share_target": {
+    "action": "/",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}
