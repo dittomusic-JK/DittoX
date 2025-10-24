@@ -1,62 +1,12 @@
-// Vercel Serverless Function - api/all-data.js
-const axios = require('axios');
- 
-// Webflow API Configuration
-const WEBFLOW_API_TOKEN = process.env.WEBFLOW_API_TOKEN;
-const SITE_ID = '655e0fa544c67c1ee5ce01a4';
+// Vercel Serverless Function - Converted from working proxy
+// This matches your local proxy that was working
 
-const COLLECTION_IDS = {
-    speakers: '655e0fa544c67c1ee5ce01cb',
-    schedule: '655e0fa544c67c1ee5ce01c9',
-    sponsors: '655e0fa544c67c1ee5ce01d2',
-    stages: '655e0fa544c67c1ee5ce01c8',
-    exhibitors: '686d0e5c8b5fa9db95a0e47e'
+const WEBFLOW_CONFIG = {
+    siteId: '655e0fa544c67c1ee5ce01a4',
+    apiToken: process.env.WEBFLOW_API_TOKEN,
+    baseUrl: 'https://api.webflow.com/v2'
 };
 
-// Fetch from Webflow
-async function fetchCollection(collectionId) {
-    try {
-        const response = await axios.get(
-            `https://api.webflow.com/v2/collections/${collectionId}/items`,
-            {
-                headers: {
-                    'Authorization': `Bearer ${WEBFLOW_API_TOKEN}`,
-                    'accept-version': '1.0.0'
-                }
-            }
-        );
-        return response.data.items || [];
-    } catch (error) {
-        console.error(`Error fetching ${collectionId}:`, error.message);
-        return [];
-    }
-}
-
-// Process schedule with relationships
-function processScheduleItems(scheduleItems, speakers, stages) {
-    return scheduleItems.map(item => {
-        const speakerIds = item.fieldData?.speakers || [];
-        const stageId = item.fieldData?.stage;
-        
-        const relatedSpeakers = speakers.filter(s => speakerIds.includes(s.id));
-        const speakerNames = relatedSpeakers
-            .map(s => s.fieldData?.name)
-            .filter(Boolean)
-            .join(', ');
-        
-        const relatedStage = stages.find(s => s.id === stageId);
-        const stageName = relatedStage?.fieldData?.name || '';
-        
-        return {
-            ...item,
-            speakerNames,
-            stageName,
-            relatedSpeakers
-        };
-    });
-}
-
-// Vercel Serverless Function Handler
 module.exports = async (req, res) => {
     // Enable CORS
     res.setHeader('Access-Control-Allow-Credentials', true);
@@ -64,47 +14,138 @@ module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
     
-    // Handle OPTIONS request
     if (req.method === 'OPTIONS') {
         res.status(200).end();
         return;
     }
 
     try {
-        console.log('Fetching all collections...');
-        
-        const [speakers, schedule, sponsors, stages, exhibitors] = await Promise.all([
-            fetchCollection(COLLECTION_IDS.speakers),
-            fetchCollection(COLLECTION_IDS.schedule),
-            fetchCollection(COLLECTION_IDS.sponsors),
-            fetchCollection(COLLECTION_IDS.stages),
-            fetchCollection(COLLECTION_IDS.exhibitors)
-        ]);
-        
-        const processedSchedule = processScheduleItems(schedule, speakers, stages);
-        
-        const data = {
-            speakers,
-            schedule: processedSchedule,
-            sponsors,
-            stages,
-            exhibitors
+        const headers = {
+            'Authorization': `Bearer ${WEBFLOW_CONFIG.apiToken}`,
+            'accept': 'application/json'
         };
+
+        // Get collections first
+        const collectionsResponse = await fetch(
+            `${WEBFLOW_CONFIG.baseUrl}/sites/${WEBFLOW_CONFIG.siteId}/collections`,
+            { headers }
+        );
+        const collectionsData = await collectionsResponse.json();
         
-        console.log('✓ Data fetched:', {
-            speakers: speakers.length,
-            schedule: schedule.length,
-            sponsors: sponsors.length,
-            stages: stages.length,
-            exhibitors: exhibitors.length
+        // Find collection IDs by searching display names
+        const collections = collectionsData.collections || [];
+        
+        console.log('📚 ALL COLLECTIONS FOUND:');
+        collections.forEach(c => {
+            console.log(`  - "${c.displayName}" (slug: ${c.slug}, id: ${c.id})`);
         });
         
-        res.status(200).json(data);
+        const speakersCollection = collections.find(c => 
+            c.displayName?.toLowerCase().includes('speaker') || c.slug?.toLowerCase().includes('speaker')
+        );
+        const scheduleCollection = collections.find(c => 
+            c.displayName?.toLowerCase().includes('schedule') || c.slug?.toLowerCase().includes('schedule')
+        );
+        const sponsorsCollection = collections.find(c => 
+            c.displayName?.toLowerCase().includes('sponsor') || c.slug?.toLowerCase().includes('sponsor')
+        );
+        const stagesCollection = collections.find(c => 
+            c.displayName?.toLowerCase().includes('stage') || c.slug?.toLowerCase().includes('stage')
+        );
+        const exhibitorsCollection = collections.find(c => 
+            c.displayName?.toLowerCase().includes('exhibitor') || c.slug?.toLowerCase().includes('exhibitor')
+        );
+        
+        console.log('✅ MATCHED COLLECTIONS:');
+        console.log('  Speakers:', speakersCollection?.displayName || 'NOT FOUND');
+        console.log('  Schedule:', scheduleCollection?.displayName || 'NOT FOUND');
+        console.log('  Sponsors:', sponsorsCollection?.displayName || 'NOT FOUND');
+        console.log('  Stages:', stagesCollection?.displayName || 'NOT FOUND');
+        console.log('  Exhibitors:', exhibitorsCollection?.displayName || 'NOT FOUND');
+
+        // Fetch all collections in parallel
+        const [speakers, scheduleItems, sponsors, stagesList, exhibitors] = await Promise.all([
+            speakersCollection ? 
+                fetch(`${WEBFLOW_CONFIG.baseUrl}/collections/${speakersCollection.id}/items`, { headers })
+                    .then(r => r.json()).then(d => d.items || []) : 
+                Promise.resolve([]),
+            scheduleCollection ? 
+                fetch(`${WEBFLOW_CONFIG.baseUrl}/collections/${scheduleCollection.id}/items`, { headers })
+                    .then(r => r.json()).then(d => d.items || []) : 
+                Promise.resolve([]),
+            sponsorsCollection ? 
+                fetch(`${WEBFLOW_CONFIG.baseUrl}/collections/${sponsorsCollection.id}/items`, { headers })
+                    .then(r => r.json()).then(d => d.items || []) : 
+                Promise.resolve([]),
+            stagesCollection ? 
+                fetch(`${WEBFLOW_CONFIG.baseUrl}/collections/${stagesCollection.id}/items`, { headers })
+                    .then(r => r.json()).then(d => {
+                        const items = d.items || [];
+                        // Filter for London event (Main Room at Indigo O2)
+                        const filtered = items.filter(item => 
+                            item.fieldData?.event === '386bc0edacc93d0d034fa7bff70938a2'
+                        );
+                        console.log(`🎪 STAGES: Found ${items.length} total stages, filtered to ${filtered.length} London stages`);
+                        return filtered;
+                    }) : 
+                Promise.resolve([]),
+            exhibitorsCollection ? 
+                fetch(`${WEBFLOW_CONFIG.baseUrl}/collections/${exhibitorsCollection.id}/items`, { headers })
+                    .then(r => r.json()).then(d => d.items || []) : 
+                Promise.resolve([])
+        ]);
+
+        // Create lookup maps for stages and speakers
+        const stagesMap = {};
+        stagesList.forEach(stage => {
+            stagesMap[stage.id] = stage.fieldData?.name || stage.fieldData?.['stage-name'] || 'Unknown Stage';
+        });
+
+        const speakersMap = {};
+        speakers.forEach(speaker => {
+            speakersMap[speaker.id] = speaker.fieldData?.name || 'Unknown Speaker';
+        });
+
+        // Filter schedule for MTMI: 25 and enhance with resolved names
+        const schedule = scheduleItems
+            .filter(item => item.fieldData?.event === '86742d9d05a1057c7f30ce72498d21da')
+            .map(item => {
+                const enhanced = { ...item };
+                const fields = enhanced.fieldData;
+                
+                // Resolve stage name from ID
+                if (fields.stage) {
+                    enhanced.stageName = stagesMap[fields.stage] || 'Main Stage';
+                }
+                if (fields.stages) {
+                    enhanced.stageName = stagesMap[fields.stages] || enhanced.stageName || 'Main Stage';
+                }
+                
+                // Resolve speaker names from IDs
+                if (fields['speakers-2'] && Array.isArray(fields['speakers-2'])) {
+                    enhanced.speakerNames = fields['speakers-2']
+                        .map(id => speakersMap[id])
+                        .filter(name => name)
+                        .join(', ');
+                }
+                
+                return enhanced;
+            });
+
+        console.log(`📅 SCHEDULE: Found ${scheduleItems.length} total items, filtered to ${schedule.length} MTMI: 25 items`);
+        console.log(`🎪 STAGES: Loaded ${Object.keys(stagesMap).length} stages`);
+        console.log(`🎤 SPEAKERS: Loaded ${Object.keys(speakersMap).length} speakers`);
+        console.log(`🏢 EXHIBITORS: Loaded ${exhibitors.length} exhibitors`);
+
+        res.status(200).json({
+            speakers,
+            schedule,
+            sponsors,
+            stages: stagesList,
+            exhibitors
+        });
     } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ 
-            error: 'Failed to fetch data',
-            message: error.message 
-        });
+        console.error('Error fetching all data:', error);
+        res.status(500).json({ error: error.message });
     }
 };
