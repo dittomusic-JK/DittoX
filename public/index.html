@@ -11,6 +11,7 @@
             src: url('https://assets.website-files.com/655e0fa544c67c1ee5ce01a4/655e0fa544c67c1ee5ce027c_NeusaNextStd-Bold.otf') format('opentype');
             font-weight: 700;
             font-style: normal;
+            font-display: swap; /* Prevents invisible text on mobile while loading */
         }
         
         @font-face {
@@ -18,6 +19,7 @@
             src: url('https://assets.website-files.com/655e0fa544c67c1ee5ce01a4/655e0fa544c67c1ee5ce027d_NeusaNextStd-Regular.otf') format('opentype');
             font-weight: 400;
             font-style: normal;
+            font-display: swap; /* Prevents invisible text on mobile while loading */
         }
         
         /* Satoshi Font for Body */
@@ -26,6 +28,7 @@
             src: url('https://assets.website-files.com/655e0fa544c67c1ee5ce01a4/655e0fa544c67c1ee5ce027e_Satoshi-Variable.woff2') format('woff2');
             font-weight: 300 900;
             font-style: normal;
+            font-display: swap; /* Prevents invisible text on mobile while loading */
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -92,8 +95,6 @@
             .nav {
                 max-width: 100%;
             }
-        }
-            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
         }
         
         .nav-btn {
@@ -667,17 +668,17 @@
     </div>
     
     <script>
-    // Proxy API Configuration
-    const API_BASE = '/api';
+        // API Configuration
+        const API_BASE = '/api';
 
-    // Data storage
-    let webflowData = {
-        speakers: [],
-        schedule: [],
-        sponsors: [],
-        stages: [],
-        exhibitors: []
-    };
+        // Data storage
+        let webflowData = {
+            speakers: [],
+            schedule: [],
+            sponsors: [],
+            stages: [],
+            exhibitors: []
+        };
 
         let fav = new Set();
         let currentSession = null;
