@@ -678,16 +678,17 @@
     </div>
     
     <script>
+    // Proxy API Configuration
+    const API_BASE = '/api';
 
-
-        // Data storage
-        let webflowData = {
-            speakers: [],
-            schedule: [],
-            sponsors: [],
-            stages: [],
-            exhibitors: []
-        };
+    // Data storage
+    let webflowData = {
+        speakers: [],
+        schedule: [],
+        sponsors: [],
+        stages: [],
+        exhibitors: []
+    };
 
         let fav = new Set();
         let currentSession = null;
