@@ -33,35 +33,51 @@
         body {
             font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
-            background-attachment: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             min-height: 100vh;
-            margin: 0;
-            padding: 0;
-            padding-bottom: 80px; /* Space for fixed navigation */
+            padding: 40px 20px;
         }
         
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+        .phone {
+            width: 390px;
+            height: 844px;
             background: #070707;
-            min-height: 100vh;
+            border-radius: 50px;
+            box-shadow: 
+                0 50px 100px rgba(0, 255, 153, 0.1),
+                0 30px 60px rgba(126, 0, 233, 0.15),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+            overflow: hidden;
             position: relative;
+            animation: phoneFloat 6s ease-in-out infinite;
         }
         
-        /* Responsive breakpoints */
-        @media (max-width: 768px) {
-            .container {
-                max-width: 100%;
-            }
+        @keyframes phoneFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .status-bar {
+            background: rgba(7, 7, 7, 0.95);
+            backdrop-filter: blur(20px);
+            color: #00ff99;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Satoshi', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(0, 255, 153, 0.1);
         }
         
         .page {
-            min-height: calc(100vh - 80px);
+            height: calc(100% - 120px);
             overflow-y: auto;
             overflow-x: hidden;
             background: #070707;
             scroll-behavior: smooth;
-            padding-bottom: 20px;
         }
         
         .page::-webkit-scrollbar { width: 4px; }
@@ -72,27 +88,16 @@
         }
         
         .nav {
-            position: fixed;
+            position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(7, 7, 7, 0.98);
+            background: rgba(7, 7, 7, 0.95);
             backdrop-filter: blur(30px);
             border-top: 1px solid rgba(0, 255, 153, 0.2);
             display: flex;
             justify-content: space-around;
             padding: 8px;
-            max-width: 1200px;
-            margin: 0 auto;
-            z-index: 1000;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
-        }
-        
-        @media (max-width: 768px) {
-            .nav {
-                max-width: 100%;
-            }
-        }
             box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
         }
         
@@ -630,7 +635,12 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="phone">
+        <div class="status-bar">
+            <span>9:41</span>
+            <span>📶 ⚡ 100%</span>
+        </div>
+        
         <div class="page" id="content">
             <div class="loading">
                 <img src="https://cdn.prod.website-files.com/655e0fa544c67c1ee5ce01a4/655e0fa544c67c1ee5ce040f_dittoxicon-white.svg" 
@@ -667,16 +677,17 @@
     </div>
     
     <script>
+    // Proxy API Configuration
+    const API_BASE = '/api';
 
-
-        // Data storage
-        let webflowData = {
-            speakers: [],
-            schedule: [],
-            sponsors: [],
-            stages: [],
-            exhibitors: []
-        };
+    // Data storage
+    let webflowData = {
+        speakers: [],
+        schedule: [],
+        sponsors: [],
+        stages: [],
+        exhibitors: []
+    };
 
         let fav = new Set();
         let currentSession = null;
