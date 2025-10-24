@@ -1,6 +1,6 @@
 // Vercel Serverless Function - api/all-data.js
 const axios = require('axios');
-
+ 
 // Webflow API Configuration
 const WEBFLOW_API_TOKEN = process.env.WEBFLOW_API_TOKEN;
 const SITE_ID = '655e0fa544c67c1ee5ce01a4';
