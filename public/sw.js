@@ -80,6 +80,13 @@ self.addEventListener('fetch', (event) => {
     const { request } = event;
     const url = new URL(request.url);
     
+    // Skip service worker for external domains (dashboard, recaptcha, etc)
+    if (url.hostname !== self.location.hostname && 
+        url.hostname !== 'cdn.prod.website-files.com') {
+        // Let external requests pass through without interception
+        return;
+    }
+    
     // Handle API requests differently
     if (url.pathname.startsWith('/api/')) {
         event.respondWith(handleApiRequest(request));
