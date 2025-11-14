@@ -372,7 +372,30 @@
 <body>
     <!-- Sign Up Form -->
     <div class="custom-g-recaptcha-form-wrapper w-form">
-        <h3 class="heading-183">Sign up now</h3>
+        <h3 class="heading-183" id="form-heading">Sign up now</h3>
+        
+        <!-- Success Message (hidden by default) -->
+        <div id="success-message" style="display: none; text-align: center; padding: 40px 20px;">
+            <div style="font-size: 80px; margin-bottom: 20px; animation: checkBounce 0.6s ease-out;">✅</div>
+            <h2 style="font-size: 32px; margin-bottom: 16px; color: white; font-family: 'Satoshi', sans-serif; font-weight: 700;">🙌 You're in!</h2>
+            <p style="font-size: 16px; line-height: 1.8; color: rgba(255,255,255,0.9); margin-bottom: 24px;">
+                Winners will be announced on the <strong>Main Stage at 4:30pm</strong>.<br>
+                You must be present to claim your prize — don't miss it!
+            </p>
+            <div style="background: rgba(0,255,153,0.15); border: 2px solid rgba(0,255,153,0.4); border-radius: 12px; padding: 16px; margin-top: 20px;">
+                <p style="font-size: 14px; color: rgba(255,255,255,0.85); margin: 0;">
+                    🎸 Good luck! We'll also email you music industry tips and opportunities.
+                </p>
+            </div>
+        </div>
+        
+        <style>
+            @keyframes checkBounce {
+                0% { transform: scale(0); }
+                50% { transform: scale(1.2); }
+                100% { transform: scale(1); }
+            }
+        </style>
        
         <form 
             id="wf-form-Sign-Up" 
@@ -510,12 +533,32 @@
             const dittoForm = document.querySelector("form#wf-form-Sign-Up");
             const mailchimpForm = document.getElementById("mailchimpForm");
             const compLoggerForm = document.getElementById("compLoggerForm");
+            const successMessage = document.getElementById("success-message");
+            const formHeading = document.getElementById("form-heading");
+            
+            // Check if user already entered
+            if (localStorage.getItem('dittox_comp_entered') === 'true') {
+                dittoForm.style.display = 'none';
+                formHeading.style.display = 'none';
+                successMessage.style.display = 'block';
+                return;
+            }
             
             if (dittoForm) {
                 dittoForm.addEventListener("submit", function(e) {
                     const emailField = dittoForm.querySelector("input[name='email']");
                     const nameField = dittoForm.querySelector("input[name='fullname']");
                     const optIn = dittoForm.querySelector("#marketing_opt_in");
+                    
+                    // Mark as entered in localStorage
+                    localStorage.setItem('dittox_comp_entered', 'true');
+                    
+                    // Show success message after a brief delay (to ensure submission completes)
+                    setTimeout(function() {
+                        dittoForm.style.display = 'none';
+                        formHeading.style.display = 'none';
+                        successMessage.style.display = 'block';
+                    }, 1000);
                     
                     // Log to competition sheet first
                     if (compLoggerForm && emailField && nameField) {
