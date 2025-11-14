@@ -378,12 +378,12 @@
         <div id="success-message" style="display: none; text-align: center; padding: 40px 20px;">
             <div style="font-size: 80px; margin-bottom: 20px; animation: checkBounce 0.6s ease-out;">✅</div>
             <h2 style="font-size: 32px; margin-bottom: 16px; color: white; font-family: 'Satoshi', sans-serif; font-weight: 700;">🙌 You're in!</h2>
-            <p style="font-size: 16px; line-height: 1.8; color: rgba(255,255,255,0.9); margin-bottom: 24px;">
+            <p style="font-family: 'Satoshi', sans-serif; font-size: 16px; line-height: 1.8; color: rgba(255,255,255,0.9); margin-bottom: 24px;">
                 Winners will be announced on the <strong>Main Stage at 4:30pm</strong>.<br>
                 You must be present to claim your prize — don't miss it!
             </p>
             <div style="background: rgba(0,255,153,0.15); border: 2px solid rgba(0,255,153,0.4); border-radius: 12px; padding: 16px; margin-top: 20px;">
-                <p style="font-size: 14px; color: rgba(255,255,255,0.85); margin: 0;">
+                <p style="font-family: 'Satoshi', sans-serif; font-size: 14px; color: rgba(255,255,255,0.85); margin: 0;">
                     🎸 Good luck! We'll also email you music industry tips and opportunities.
                 </p>
             </div>
@@ -546,19 +546,15 @@
             
             if (dittoForm) {
                 dittoForm.addEventListener("submit", function(e) {
+                    e.preventDefault(); // Prevent default form submission
+                    
                     const emailField = dittoForm.querySelector("input[name='email']");
                     const nameField = dittoForm.querySelector("input[name='fullname']");
                     const optIn = dittoForm.querySelector("#marketing_opt_in");
+                    const passwordField = dittoForm.querySelector("input[name='password']");
                     
                     // Mark as entered in localStorage
                     localStorage.setItem('dittox_comp_entered', 'true');
-                    
-                    // Show success message after a brief delay (to ensure submission completes)
-                    setTimeout(function() {
-                        dittoForm.style.display = 'none';
-                        formHeading.style.display = 'none';
-                        successMessage.style.display = 'block';
-                    }, 1000);
                     
                     // Log to competition sheet first
                     if (compLoggerForm && emailField && nameField) {
@@ -578,7 +574,43 @@
                         mailchimpForm.submit();
                     }
                     
-                    // Note: Main form will continue to submit to Ditto API
+                    // Submit to Ditto API manually via fetch
+                    const formData = new FormData();
+                    formData.append('email', emailField.value);
+                    formData.append('password', passwordField.value);
+                    formData.append('marketing_opt_in', dittoForm.querySelector('#marketing_opt_in').checked);
+                    formData.append('terms_accepted', dittoForm.querySelector('#terms_accepted').checked);
+                    formData.append('signup_source', 'webflow-signup');
+                    formData.append('campaign', 'site-signup');
+                    
+                    // Get reCAPTCHA response
+                    const recaptchaResponse = grecaptcha.getResponse();
+                    if (recaptchaResponse) {
+                        formData.append('g-recaptcha-response', recaptchaResponse);
+                    }
+                    
+                    // Submit to Ditto API
+                    fetch('https://dashboard2.dittomusic.com/api/users', {
+                        method: 'POST',
+                        body: formData
+                    }).then(function(response) {
+                        if (response.ok) {
+                            // Show success message
+                            dittoForm.style.display = 'none';
+                            formHeading.style.display = 'none';
+                            successMessage.style.display = 'block';
+                            
+                            // Open Ditto dashboard in new tab
+                            var redirectUrl = 'https://dashboard.dittomusic.com/users/start_jwt_session?action=signup&redirect=https://dashboard.dittomusic.com/subscriptions';
+                            window.open(redirectUrl, '_blank');
+                        } else {
+                            console.error('Signup failed:', response);
+                            alert('Signup failed. Please try again.');
+                        }
+                    }).catch(function(error) {
+                        console.error('Signup error:', error);
+                        alert('An error occurred. Please try again.');
+                    });
                 });
             }
             
