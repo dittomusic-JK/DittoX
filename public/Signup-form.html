@@ -538,6 +538,35 @@
                     // Note: Main form will continue to submit to Ditto API
                 });
             }
+            
+            // Listen for successful form submission and force redirect to break out of iframe
+            window.addEventListener('message', function(event) {
+                // Check if message is from Ditto dashboard indicating success
+                if (event.data && (event.data.success || event.data.redirect)) {
+                    var redirectUrl = dittoForm.getAttribute('redirect') || dittoForm.getAttribute('data-redirect');
+                    if (redirectUrl) {
+                        // Force parent window to redirect
+                        window.top.location.href = redirectUrl;
+                    }
+                }
+            });
+            
+            // Alternative: Intercept form submission result
+            var originalFetch = window.fetch;
+            window.fetch = function() {
+                return originalFetch.apply(this, arguments).then(function(response) {
+                    // If this is the Ditto API call and it succeeds, force redirect
+                    if (response.ok && arguments[0].includes('dashboard2.dittomusic.com')) {
+                        setTimeout(function() {
+                            var redirectUrl = dittoForm.getAttribute('redirect') || dittoForm.getAttribute('data-redirect');
+                            if (redirectUrl) {
+                                window.top.location.href = redirectUrl;
+                            }
+                        }, 500);
+                    }
+                    return response;
+                });
+            }
         });
     </script>
 </body>
