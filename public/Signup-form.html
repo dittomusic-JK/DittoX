@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ditto Signup Form</title>
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,500,400&display=swap" rel="stylesheet">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <style>
+        :root {
+            --purple: #5F1FFF;
+            --light-purple: #9D5FFF;
+            --light-blue: #2680EB;
+            --pro-green: #00FF99;
+            --red: #EC0515;
+        }
+
+        /* Sign Up Form - Glassmorphic card */
+        .custom-g-recaptcha-form-wrapper {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 2px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 28px !important;
+            padding: 40px !important;
+            backdrop-filter: blur(20px) !important;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+            position: relative !important;
+            overflow: hidden !important;
+            max-width: 480px !important;
+            margin: 0 auto !important;
+        }
+
+        .custom-g-recaptcha-form-wrapper::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            height: 3px !important;
+            background: linear-gradient(90deg, #7B3FF2 0%, var(--purple) 50%, #9D5FFF 100%) !important;
+            background-size: 200% 100% !important;
+            animation: gradientMove 3s linear infinite !important;
+            border-radius: 28px 28px 0 0 !important;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        /* AGGRESSIVE RESET FOR WEBFLOW H3 SPACING */
+        .custom-g-recaptcha-form-wrapper h3,
+        .custom-g-recaptcha-form-wrapper .heading-183 {
+            font-size: 26px !important;
+            font-weight: 700 !important;
+            margin: 0 0 16px 0 !important;
+            padding: 0 !important;
+            color: white !important;
+            font-family: 'Satoshi', sans-serif !important;
+            line-height: 1.2 !important;
+        }
+
+        .custom-g-recaptcha-form-wrapper .subtitle {
+            color: rgba(255, 255, 255, 0.7) !important;
+            font-size: 14px !important;
+            margin: 0 0 24px 0 !important;
+            padding: 0 !important;
+            line-height: 1.5 !important;
+            font-family: 'Satoshi', sans-serif !important;
+        }
+
+        /* Custom form styles - OVERRIDE ALL WEBFLOW STYLES */
+        .custom-g-recaptcha-form-wrapper *,
+        .custom-g-recaptcha-form-wrapper *::before,
+        .custom-g-recaptcha-form-wrapper *::after {
+            box-sizing: border-box !important;
+        }
+
+        .custom-g-recaptcha-form-wrapper form {
+            background: transparent !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .custom-g-recaptcha-form-wrapper .form-group {
+            margin-bottom: 18px !important;
+            position: relative !important;
+            z-index: 2 !important;
+            background: transparent !important;
+            padding: 0 !important;
+        }
+
+        /* FIXED FLOATING LABEL SYSTEM */
+        .custom-g-recaptcha-form-wrapper .floating-label,
+        .custom-g-recaptcha-form-wrapper .field-label-8 {
+            position: absolute !important;
+            left: 16px !important;
+            top: 16px !important;
+            transform: none !important;
+            font-size: 15px !important;
+            color: rgba(255, 255, 255, 0.4) !important;
+            transition: all 0.3s ease !important;
+            pointer-events: none !important;
+            background: transparent !important;
+            padding: 0 4px !important;
+            font-family: 'Satoshi', sans-serif !important;
+            margin: 0 !important;
+            line-height: 1 !important;
+            z-index: 3 !important;
+        }
+
+        /* When input is focused OR has content */
+        .custom-g-recaptcha-form-wrapper input[type="email"]:focus ~ .floating-label,
+        .custom-g-recaptcha-form-wrapper input[type="email"]:not(:placeholder-shown) ~ .floating-label,
+        .custom-g-recaptcha-form-wrapper input[type="email"]:focus ~ .field-label-8,
+        .custom-g-recaptcha-form-wrapper input[type="email"]:not(:placeholder-shown) ~ .field-label-8,
+        .custom-g-recaptcha-form-wrapper input[type="password"]:focus ~ .floating-label,
+        .custom-g-recaptcha-form-wrapper input[type="password"]:not(:placeholder-shown) ~ .floating-label,
+        .custom-g-recaptcha-form-wrapper input[type="password"]:focus ~ .field-label-8,
+        .custom-g-recaptcha-form-wrapper input[type="password"]:not(:placeholder-shown) ~ .field-label-8 {
+            top: -10px !important;
+            left: 12px !important;
+            font-size: 11px !important;
+            color: var(--light-purple) !important;
+            font-weight: 500 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            background: rgba(10, 10, 15, 0.95) !important;
+            padding: 2px 6px !important;
+            border-radius: 4px !important;
+        }
+
+        .custom-g-recaptcha-form-wrapper input[type="email"],
+        .custom-g-recaptcha-form-wrapper input[type="password"],
+        .custom-g-recaptcha-form-wrapper input[type="text"],
+        .custom-g-recaptcha-form-wrapper .text-field-4,
+        .custom-g-recaptcha-form-wrapper .w-input {
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 14px 16px !important;
+            margin: 0 !important;
+            border: 2px solid rgba(255, 255, 255, 0.15) !important;
+            border-radius: 12px !important;
+            font-family: 'Satoshi', sans-serif !important;
+            font-size: 15px !important;
+            transition: all 0.3s !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+            color: white !important;
+            backdrop-filter: blur(10px) !important;
+            box-sizing: border-box !important;
+            line-height: 1.5 !important;
+            height: auto !important;
+            min-height: 48px !important;
+        }
+
+        /* Hide placeholder initially, show when focused */
+        .custom-g-recaptcha-form-wrapper input[type="email"]::placeholder,
+        .custom-g-recaptcha-form-wrapper input[type="password"]::placeholder {
+            opacity: 0 !important;
+        }
+
+        .custom-g-recaptcha-form-wrapper input[type="email"]:focus,
+        .custom-g-recaptcha-form-wrapper input[type="password"]:focus,
+        .custom-g-recaptcha-form-wrapper input[type="text"]:focus,
+        .custom-g-recaptcha-form-wrapper .w-input:focus {
+            outline: none !important;
+            border-color: var(--light-purple) !important;
+            background: rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 0 0 3px rgba(157, 95, 255, 0.15), 0 6px 20px rgba(157, 95, 255, 0.2) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        /* Checkbox styling */
+        .custom-g-recaptcha-form-wrapper .checkbox-wrapper,
+        .custom-g-recaptcha-form-wrapper .marketing_opt_in,
+        .custom-g-recaptcha-form-wrapper .terms_accepted,
+        .custom-g-recaptcha-form-wrapper .w-embed {
+            margin-bottom: 10px !important;
+            position: relative !important;
+            background: transparent !important;
+            padding: 0 !important;
+        }
+
+        .custom-g-recaptcha-form-wrapper .w-checkbox,
+        .custom-g-recaptcha-form-wrapper .marketing-consent {
+            display: flex !important;
+            align-items: flex-start !important;
+            gap: 10px !important;
+            cursor: pointer !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: transparent !important;
+        }
+
+        .custom-g-recaptcha-form-wrapper .w-checkbox-input {
+            width: 18px !important;
+            height: 18px !important;
+            min-width: 18px !important;
+            max-width: 18px !important;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+            border-radius: 5px !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+            cursor: pointer !important;
+            transition: all 0.3s !important;
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            margin: 2px 0 0 0 !important;
+            padding: 0 !important;
+            position: relative !important;
+            flex-shrink: 0 !important;
+        }
+
+        .custom-g-recaptcha-form-wrapper .w-checkbox-input:checked {
+            background: linear-gradient(135deg, var(--light-purple) 0%, var(--light-blue) 100%) !important;
+            border-color: var(--light-purple) !important;
+        }
+
+        .custom-g-recaptcha-form-wrapper .w-checkbox-input:checked::after {
+            content: '✓' !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            color: #0A0A0F !important;
+            font-size: 12px !important;
+            font-weight: bold !important;
+        }
+
+        .custom-g-recaptcha-form-wrapper .w-form-label {
+            color: rgba(255, 255, 255, 0.8) !important;
+            font-size: 12px !important;
+            line-height: 1.4 !important;
+            font-family: 'Satoshi', sans-serif !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            flex: 1 !important;
+            background: transparent !important;
+        }
+
+        .custom-g-recaptcha-form-wrapper .w-form-label a {
+            color: var(--light-purple) !important;
+            text-decoration: none !important;
+            font-weight: 500 !important;
+            transition: all 0.2s !important;
+        }
+
+        .custom-g-recaptcha-form-wrapper .w-form-label a:hover {
+            text-decoration: underline !important;
+        }
+
+        /* reCAPTCHA container styling */
+        .custom-g-recaptcha-form-wrapper .recaptcha-wrapper,
+        .custom-g-recaptcha-form-wrapper .g-recaptcha {
+            margin: 16px 0 !important;
+            position: relative !important;
+            z-index: 2 !important;
+            display: flex !important;
+            justify-content: center !important;
+        }
+
+        /* Hidden fields */
+        .custom-g-recaptcha-form-wrapper .extras {
+            display: none !important;
+        }
+
+        /* Submit button */
+        .custom-g-recaptcha-form-wrapper input[type="submit"],
+        .custom-g-recaptcha-form-wrapper .btn-primary,
+        .custom-g-recaptcha-form-wrapper .master-button,
+        .custom-g-recaptcha-form-wrapper .w-button {
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 16px 24px !important;
+            margin: 0 !important;
+            background: linear-gradient(135deg, #823FF3 0%, #3928ED 100%) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 100px !important;
+            font-family: 'Satoshi', sans-serif !important;
+            font-size: 15px !important;
+            font-weight: 700 !important;
+            cursor: pointer !important;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important;
+            position: relative !important;
+            overflow: hidden !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            box-sizing: border-box !important;
+            height: auto !important;
+            line-height: 1.4 !important;
+        }
+
+        .custom-g-recaptcha-form-wrapper input[type="submit"]:hover,
+        .custom-g-recaptcha-form-wrapper .btn-primary:hover,
+        .custom-g-recaptcha-form-wrapper .master-button:hover {
+            transform: translateY(-2px) scale(1.01) !important;
+            box-shadow: 0 10px 35px rgba(130, 63, 243, 0.5) !important;
+        }
+
+        /* Error message styling */
+        .custom-g-recaptcha-form-wrapper .w-form-fail {
+            background: rgba(236, 5, 21, 0.1) !important;
+            border: 2px solid var(--red) !important;
+            border-radius: 12px !important;
+            padding: 12px 16px !important;
+            margin: 12px 0 !important;
+            color: var(--red) !important;
+            font-size: 14px !important;
+        }
+
+        /* Completely hide the Mailchimp ghost form + iframe */
+        #mailchimpForm,
+        #mailchimpForm *,
+        iframe[name="hidden_iframe"] {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            position: absolute !important;
+            left: -9999px !important;
+            top: -9999px !important;
+            height: 0 !important;
+            width: 0 !important;
+            overflow: hidden !important;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .custom-g-recaptcha-form-wrapper {
+                padding: 28px 24px !important;
+                border-radius: 20px !important;
+            }
+
+            .custom-g-recaptcha-form-wrapper h3,
+            .custom-g-recaptcha-form-wrapper .heading-183 {
+                font-size: 22px !important;
+            }
+
+            .custom-g-recaptcha-form-wrapper .subtitle {
+                font-size: 13px !important;
+                margin: 0 0 20px 0 !important;
+            }
+
+            .custom-g-recaptcha-form-wrapper .form-group {
+                margin-bottom: 16px !important;
+            }
+
+            .custom-g-recaptcha-form-wrapper input[type="submit"],
+            .custom-g-recaptcha-form-wrapper .btn-primary,
+            .custom-g-recaptcha-form-wrapper .master-button,
+            .custom-g-recaptcha-form-wrapper .w-button {
+                padding: 14px 20px !important;
+                font-size: 14px !important;
+            }
+
+            .custom-g-recaptcha-form-wrapper .g-recaptcha {
+                transform: scale(0.85) !important;
+                transform-origin: center !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .custom-g-recaptcha-form-wrapper {
+                padding: 24px 20px !important;
+            }
+
+            .custom-g-recaptcha-form-wrapper .g-recaptcha {
+                transform: scale(0.78) !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sign Up Form -->
+    <div class="custom-g-recaptcha-form-wrapper w-form">
+        <h3 class="heading-183">Sign up now</h3>
+       
+        <form 
+            id="wf-form-Sign-Up" 
+            name="wf-form-Sign-Up" 
+            data-name="Sign Up"
+            action="https://dashboard2.dittomusic.com/api/users" 
+            method="post"
+            class="g-recaptcha-custom"
+            redirect="https://dashboard.dittomusic.com/users/start_jwt_session?action=signup&redirect=https://dashboard.dittomusic.com/subscriptions"
+            data-redirect="https://dashboard.dittomusic.com/users/start_jwt_session?action=signup&redirect=https://dashboard.dittomusic.com/subscriptions"
+            data-wf-page-id="6891c99cc02c2c266cd47fcc"
+            data-wf-element-id="99be26a9-8386-99a5-5cc6-f8642791aa45"
+            data-wf-locale-id="655e0fd044c67c1ee5ce4f04"
+            aria-label="Sign Up">
+            
+            <div class="form-group">
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    class="text-field-4 w-input" 
+                    maxlength="256"
+                    data-name="email"
+                    placeholder=" " 
+                    required>
+                <label for="email" class="floating-label field-label-8">Email Address</label>
+            </div>
+            
+            <div class="form-group">
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    class="text-field-4 w-input" 
+                    maxlength="256"
+                    data-name="password"
+                    placeholder=" " 
+                    required>
+                <label for="password" class="floating-label field-label-8">Password</label>
+            </div>
+
+            <div class="marketing_opt_in w-embed">
+                <label class="w-checkbox marketing-consent">
+                    <input 
+                        class="w-checkbox-input" 
+                        type="checkbox" 
+                        id="marketing_opt_in" 
+                        name="marketing_opt_in" 
+                        value="true">
+                    <span class="w-form-label">
+                        Keep me up to date with music industry news and promotions.
+                    </span>
+                </label>
+            </div>
+
+            <div class="terms_accepted w-embed">
+                <label class="w-checkbox marketing-consent">
+                    <input 
+                        class="w-checkbox-input" 
+                        type="checkbox" 
+                        id="terms_accepted" 
+                        name="terms_accepted" 
+                        value="true" 
+                        required>
+                    <span class="w-form-label">
+                        I have read and agree to the 
+                        <a href="https://dittomusic.com/terms" target="_blank" rel="noopener">
+                            Terms of Service
+                        </a>.
+                    </span>
+                </label>
+            </div>
+
+            <div class="extras w-embed">
+                <input type="hidden" name="signup_source" value="webflow-signup">
+                <input type="hidden" name="campaign" value="site-signup">
+            </div>
+            
+            <div class="g-recaptcha" data-sitekey="6Lf9DN8ZAAAAAIppkX8cxIQ4OJBsBZeSc_i12yUF"></div>
+            
+            <div class="w-form-fail" style="display: none;">
+                <div>Oops! Something went wrong while submitting the form.</div>
+            </div>
+            
+            <input 
+                type="submit" 
+                data-wait="Please wait..." 
+                class="btn-primary master-button focus w-button" 
+                value="Sign up for free">
+        </form>
+    </div>
+
+    <!-- Hidden Mailchimp form -->
+    <form id="mailchimpForm"
+          action="https://dittomusic.us8.list-manage.com/subscribe/post?u=219aaf650f38f4be26e17867d&amp;id=8099b56220&amp;f_id=00ded6e1f0"
+          method="POST"
+          target="hidden_iframe">
+        <input type="email" name="EMAIL" id="mc_email">
+        <input type="hidden" name="OPTIN" value="true">
+        <input type="hidden" name="tags" value="449896">
+        <input type="hidden" name="b_219aaf650f38f4be26e17867d_8099b56220" tabindex="-1" value="">
+    </form>
+    <iframe name="hidden_iframe"></iframe>
+
+    <script>
+        // Mailchimp integration
+        document.addEventListener("DOMContentLoaded", function() {
+            const dittoForm = document.querySelector("form#wf-form-Sign-Up");
+            const mailchimpForm = document.getElementById("mailchimpForm");
+            if (dittoForm && mailchimpForm) {
+                dittoForm.addEventListener("submit", function() {
+                    const emailField = dittoForm.querySelector("input[name='email']");
+                    const optIn = dittoForm.querySelector("#marketing_opt_in");
+                    if (emailField && optIn && optIn.checked) {
+                        document.getElementById("mc_email").value = emailField.value;
+                        mailchimpForm.submit();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

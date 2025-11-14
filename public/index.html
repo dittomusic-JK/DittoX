@@ -1228,11 +1228,23 @@
                     }
                 </style>
                 
-                <div class="countdown" id="countdownContainer">
-                    <div><div class="num" id="days">00</div><div class="label">Days</div></div>
-                    <div><div class="num" id="hours">00</div><div class="label">Hours</div></div>
-                    <div><div class="num" id="mins">00</div><div class="label">Mins</div></div>
-                    <div><div class="num" id="secs">00</div><div class="label">Secs</div></div>
+                <!-- Competitions CTA block (replaces countdown) -->
+                <div style="padding: 20px;">
+                    <div style="background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); border: 1px solid rgba(0,255,153,0.2); border-radius: 16px; overflow: hidden;">
+                        <img src="/solo-studio-lead-2400-2400__13972.webp" alt="Focusrite Studio Bundle" style="width: 100%; height: auto; display: block; max-height: 260px; object-fit: cover; background:#000;">
+                        <div style="padding: 16px;">
+                            <h2 style="font-size: 22px; margin-bottom: 8px; color: white; font-family: 'Neusa', sans-serif;">Competitions</h2>
+                            <p class="text-grey" style="font-size: 14px; margin-bottom: 12px;">Two chances to win today — good luck!</p>
+                            <div style="display: grid; grid-template-columns: 1fr; gap: 10px;">
+                                <button class="btn btn-orange" onclick="showSection('extras','cash-competition')" style="width: 100%;">
+                                    <span style="position: relative; z-index: 1;">🤑 Win £250 cash!</span>
+                                </button>
+                                <button class="btn btn-purple" onclick="showSection('extras','focusrite')" style="width: 100%;">
+                                    <span style="position: relative; z-index: 1;">🎤 Win a Focusrite Production Bundle</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <div style="padding: 0 20px 20px;">
@@ -1765,7 +1777,8 @@
             },
             
             extras: () => `
-                <div style="background: linear-gradient(135deg, #ffba00, #ff7201); color: #070707; padding: 40px 24px; position: relative; overflow: hidden;">
+                <!-- Cash Competition -->
+                <div id="cash-competition" style="background: linear-gradient(135deg, #ffba00, #ff7201); color: #070707; padding: 40px 24px; position: relative; overflow: hidden;">
                     <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; 
                          background: rgba(255, 255, 255, 0.2); border-radius: 50%; filter: blur(60px);"></div>
                     
@@ -1790,6 +1803,26 @@
                         <p style="font-weight: 500;">
                             Don't forget to use our official social stickers. Just search <strong style="font-weight: 800;">"Ditto X"</strong> when posting.
                         </p>
+                        <p style="font-weight: 600; margin-top:12px;">We’ll be announcing the winner on the Main Stage at 4:30pm. You’ll need to be there in person to claim the prize.</p>
+                    </div>
+                </div>
+                
+                <!-- Focusrite Competition -->
+                <div id="focusrite" style="background: linear-gradient(135deg, #18181b, #22003a); padding: 24px; color: white;">
+                    <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(126,0,233,0.35); border-radius: 16px; overflow: hidden;">
+                        <img src="/solo-studio-lead-2400-2400__13972.webp" alt="Focusrite Production Bundle" style="width: 100%; height: auto; display:block; max-height: 260px; object-fit: cover;">
+                        <div style="padding: 16px;">
+                            <h2 style="font-size: 26px; margin-bottom: 8px; font-family: 'Neusa', sans-serif;">Win a Focusrite Production Bundle 🎤</h2>
+                            <p class="text-grey" style="margin-bottom: 12px;">
+                                Create a free Ditto account and sign up for our emails below to enter. Bonus: you’ll get the latest music industry advice and opportunities delivered straight to your inbox.
+                            </p>
+                            <p class="text-grey" style="margin-bottom: 16px;">
+                                A winner will be chosen at random, alongside 3 runners-up who’ll get a free Ditto Pro subscription each.
+                            </p>
+                            <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(126,0,233,0.35); border-radius: 12px; padding: 12px;">
+                                <iframe src="/Signup-form.html" title="Sign up" style="width: 100%; height: 620px; border: 0; border-radius: 12px; background: transparent;"></iframe>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -1886,6 +1919,9 @@
             
             setTimeout(() => {
                 content.innerHTML = pages[p]();
+                // Ensure the scroll position resets to top when switching pages
+                content.scrollTop = 0;
+                
                 content.style.opacity = '1';
                 content.style.transform = 'translateY(0)';
                 content.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
@@ -1895,7 +1931,6 @@
                 updateBadge();
                 
                 if (p === 'welcome') {
-                    startCountdown();
                     startUpNextRefresh();
                 }
                 
@@ -1906,6 +1941,20 @@
                     }, 300); // Delay to ensure DOM is fully updated
                 }
             }, 150);
+        }
+        
+        // Helper to show a page then scroll to an anchor inside it
+        function showSection(p, anchorId) {
+            show(p);
+            setTimeout(() => {
+                const content = document.getElementById('content');
+                const el = document.getElementById(anchorId);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else if (content) {
+                    content.scrollTop = 0;
+                }
+            }, 250);
         }
         
         function toggle(id) {

@@ -3,10 +3,17 @@
   "version": "1.0.0",
   "description": "Ditto X 2025 Schedule App - Interactive schedule and venue maps",
   "scripts": {
-    "dev": "vercel dev",
-    "deploy": "vercel --prod"
+    "dev": "node server.js",
+    "deploy": "vercel --prod",
+    "deploy:preview": "vercel",
+    "login": "vercel login"
   },
-  "keywords": ["dittox", "schedule", "webflow", "event"],
+  "keywords": [
+    "dittox",
+    "schedule",
+    "webflow",
+    "event"
+  ],
   "author": "Ditto Music",
   "license": "MIT",
   "dependencies": {
@@ -14,5 +21,8 @@
   },
   "engines": {
     "node": "22.x"
+  },
+  "devDependencies": {
+    "vercel": "^48.10.0"
   }
 }
