@@ -100,6 +100,17 @@ self.addEventListener('fetch', (event) => {
 // Strategy: Cache First, fallback to Network
 async function handleStaticRequest(request) {
     try {
+        // Skip caching for signup form and related services
+        const url = request.url;
+        if (url.includes('Signup-form.html') ||
+            url.includes('dashboard.dittomusic.com') ||
+            url.includes('google.com/recaptcha') ||
+            url.includes('webflow-scripts.dittomusic.com') ||
+            url.includes('dittomusic.us8.list-manage.com')) {
+            console.log('🌐 Bypassing cache for:', url);
+            return fetch(request);
+        }
+        
         // Try cache first
         const cachedResponse = await caches.match(request);
         if (cachedResponse) {
