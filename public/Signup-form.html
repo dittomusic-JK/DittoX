@@ -512,18 +512,21 @@
             const compLoggerForm = document.getElementById("compLoggerForm");
             
             if (dittoForm) {
-                dittoForm.addEventListener("submit", function() {
+                dittoForm.addEventListener("submit", function(e) {
                     const emailField = dittoForm.querySelector("input[name='email']");
                     const nameField = dittoForm.querySelector("input[name='fullname']");
                     const optIn = dittoForm.querySelector("#marketing_opt_in");
                     
-                    // Log to competition sheet
+                    // Log to competition sheet first
                     if (compLoggerForm && emailField && nameField) {
                         document.getElementById("comp_name").value = nameField.value;
                         document.getElementById("comp_email").value = emailField.value;
                         document.getElementById("comp_timestamp").value = new Date().toISOString();
+                        
+                        // Submit to Google Sheets
                         compLoggerForm.submit();
-                        console.log('✅ Competition entry logged');
+                        console.log('✅ Competition entry logged to Google Sheets');
+                        console.log('Name:', nameField.value, 'Email:', emailField.value);
                     }
                     
                     // Mailchimp integration
@@ -531,6 +534,8 @@
                         document.getElementById("mc_email").value = emailField.value;
                         mailchimpForm.submit();
                     }
+                    
+                    // Note: Main form will continue to submit to Ditto API
                 });
             }
         });
