@@ -391,6 +391,19 @@
             
             <div class="form-group">
                 <input 
+                    type="text" 
+                    id="fullname" 
+                    name="fullname" 
+                    class="text-field-4 w-input" 
+                    maxlength="256"
+                    data-name="fullname"
+                    placeholder=" " 
+                    required>
+                <label for="fullname" class="floating-label field-label-8">Full Name</label>
+            </div>
+            
+            <div class="form-group">
+                <input 
                     type="email" 
                     id="email" 
                     name="email" 
@@ -478,16 +491,43 @@
     </form>
     <iframe name="hidden_iframe"></iframe>
 
+    <!-- Google Sheets Competition Logger -->
+    <iframe name="comp_logger_iframe" style="display:none;"></iframe>
+    <form id="compLoggerForm"
+          action="YOUR_GOOGLE_APPS_SCRIPT_URL_HERE"
+          method="POST"
+          target="comp_logger_iframe"
+          style="display:none;">
+        <input type="text" name="name" id="comp_name">
+        <input type="email" name="email" id="comp_email">
+        <input type="text" name="timestamp" id="comp_timestamp">
+        <input type="text" name="form_name" value="Ditto X 25 Comp Entries">
+    </form>
+    
     <script>
-        // Mailchimp integration
+        // Mailchimp integration + Competition Logger
         document.addEventListener("DOMContentLoaded", function() {
             const dittoForm = document.querySelector("form#wf-form-Sign-Up");
             const mailchimpForm = document.getElementById("mailchimpForm");
-            if (dittoForm && mailchimpForm) {
+            const compLoggerForm = document.getElementById("compLoggerForm");
+            
+            if (dittoForm) {
                 dittoForm.addEventListener("submit", function() {
                     const emailField = dittoForm.querySelector("input[name='email']");
+                    const nameField = dittoForm.querySelector("input[name='fullname']");
                     const optIn = dittoForm.querySelector("#marketing_opt_in");
-                    if (emailField && optIn && optIn.checked) {
+                    
+                    // Log to competition sheet
+                    if (compLoggerForm && emailField && nameField) {
+                        document.getElementById("comp_name").value = nameField.value;
+                        document.getElementById("comp_email").value = emailField.value;
+                        document.getElementById("comp_timestamp").value = new Date().toISOString();
+                        compLoggerForm.submit();
+                        console.log('✅ Competition entry logged');
+                    }
+                    
+                    // Mailchimp integration
+                    if (mailchimpForm && emailField && optIn && optIn.checked) {
                         document.getElementById("mc_email").value = emailField.value;
                         mailchimpForm.submit();
                     }
