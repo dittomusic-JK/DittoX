@@ -1481,7 +1481,7 @@
                             <!-- Zoomable/Draggable Container -->
                             <div id="map-container-ground" class="map-container" style="transform-origin: center center; transition: transform 0.2s ease; user-select: none; -webkit-user-select: none;">
                                 <!-- Real venue map as background -->
-                                <img src="https://cdn.prod.website-files.com/655e0fa544c67c1ee5ce01a4/68fb46ee231d89aaea6b7063_DX25_Downstairs.webp" 
+                                <img src="/interior_map.webp" 
                                      alt="Ground Floor Map" 
                                      style="width: 100%; height: auto; display: block;">
                                 
@@ -1739,7 +1739,26 @@
                                 webflowData.exhibitors.map(exhibitor => {
                                     const url = exhibitor.fieldData?.link || exhibitor.fieldData?.url || exhibitor.fieldData?.website;
                                     const hasUrl = url && url !== '#';
-                                    const tableNumber = exhibitor.fieldData?.['table-number'] || exhibitor.fieldData?.booth || '';
+                                    // Plot number mapping from venue
+                                    const plotMapping = {
+                                        'Radio Wigwam': '1',
+                                        'Music Video Marketplace': '2',
+                                        'Rough Trade': '3',
+                                        'Groover': '4',
+                                        'Amplead': '5',
+                                        'PRS': '6',
+                                        'Sound Skool': '7',
+                                        'SupaJam': '8',
+                                        'Chalkpit Cassette': '9',
+                                        'Key Production': '10',
+                                        'ON HELD': '11',
+                                        'NHAM': '12',
+                                        'LMSUK': '13',
+                                        'PRESS AREA': '14',
+                                        'Ditto Music': '15'
+                                    };
+                                    const brandName = exhibitor.fieldData?.name || '';
+                                    const tableNumber = plotMapping[brandName] || exhibitor.fieldData?.['table-number'] || exhibitor.fieldData?.booth || '';
                                     const description = exhibitor.fieldData?.['short-bio'] || exhibitor.fieldData?.description || '';
                                     return `
                                     <${hasUrl ? `a href="${url}" target="_blank" rel="noopener noreferrer"` : 'div'} class="card brand-item" 
@@ -1756,7 +1775,7 @@
                                         </div>
                                         ${tableNumber ? `
                                             <div class="text-grey" style="font-size: 13px; font-weight: 600; margin-bottom: 6px;">
-                                                📍 Table ${tableNumber}
+                                                📍 Plot ${tableNumber}
                                             </div>
                                         ` : ''}
                                         ${description ? `
