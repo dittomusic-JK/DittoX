@@ -601,20 +601,40 @@
                         method: 'POST',
                         body: formData
                     }).then(function(response) {
-                        // Always show success message (competition entry is what matters)
-                        dittoForm.style.display = 'none';
-                        formHeading.style.display = 'none';
-                        successMessage.style.display = 'block';
+                        console.log('Ditto API response status:', response.status);
                         
-                        // Just log result, don't try to redirect
-                        if (response.ok) {
-                            console.log('Ditto account created successfully');
-                        } else {
-                            console.log('Ditto API returned non-OK status, but competition entry succeeded');
-                        }
+                        // Parse response to check for errors
+                        return response.text().then(function(text) {
+                            console.log('Ditto API response:', text);
+                            
+                            // Always show success for competition
+                            dittoForm.style.display = 'none';
+                            formHeading.style.display = 'none';
+                            successMessage.style.display = 'block';
+                            
+                            // If signup succeeded, update the dashboard button to auto-login
+                            if (response.ok) {
+                                console.log('✅ Ditto account created successfully');
+                                // The redirect URL should log them in automatically
+                                var dashboardBtn = successMessage.querySelector('a');
+                                if (dashboardBtn) {
+                                    dashboardBtn.href = 'https://dashboard.dittomusic.com/users/start_jwt_session?action=signup&redirect=https://dashboard.dittomusic.com/subscriptions';
+                                    // Try to auto-open in new tab after small delay
+                                    setTimeout(function() {
+                                        if (window.parent && window.parent !== window) {
+                                            window.parent.postMessage({
+                                                type: 'OPEN_URL',
+                                                url: dashboardBtn.href
+                                            }, '*');
+                                        }
+                                    }, 500);
+                                }
+                            } else {
+                                console.log('⚠️ Ditto API error:', text, 'but competition entry succeeded');
+                            }
+                        });
                     }).catch(function(error) {
-                        // Log but don't show error to user since competition entry succeeded
-                        console.log('Ditto API error, but competition entry succeeded:', error);
+                        console.error('❌ Ditto API fetch error:', error);
                         // Still show success for competition
                         dittoForm.style.display = 'none';
                         formHeading.style.display = 'none';
