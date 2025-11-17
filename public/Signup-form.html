@@ -388,9 +388,15 @@
                 You must be present to claim your prize — don't miss it!
             </p>
             <div style="background: rgba(0,255,153,0.15); border: 2px solid rgba(0,255,153,0.4); border-radius: 12px; padding: 12px; margin-top: 16px;">
-                <p style="font-family: 'Satoshi', sans-serif; font-size: 13px; color: rgba(255,255,255,0.85); margin: 0;">
+                <p style="font-family: 'Satoshi', sans-serif; font-size: 13px; color: rgba(255,255,255,0.85); margin: 0; margin-bottom: 12px;">
                     🎸 Good luck! We'll also email you music industry tips and opportunities.
                 </p>
+                <a href="https://dashboard.dittomusic.com/users/start_jwt_session?action=signup&redirect=https://dashboard.dittomusic.com/subscriptions" 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   style="display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, #823FF3 0%, #3928ED 100%); color: white; text-decoration: none; border-radius: 100px; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 8px;">
+                    Go to Dashboard →
+                </a>
             </div>
         </div>
         
@@ -406,6 +412,8 @@
             id="wf-form-Sign-Up" 
             name="wf-form-Sign-Up" 
             data-name="Sign Up"
+            action="#"
+            method="post"
             class="g-recaptcha-custom"
             redirect="https://dashboard.dittomusic.com/users/start_jwt_session?action=signup&redirect=https://dashboard.dittomusic.com/subscriptions"
             data-redirect="https://dashboard.dittomusic.com/users/start_jwt_session?action=signup&redirect=https://dashboard.dittomusic.com/subscriptions"
@@ -598,30 +606,10 @@
                         formHeading.style.display = 'none';
                         successMessage.style.display = 'block';
                         
-                        // Try to parse response and open dashboard if successful
+                        // Just log result, don't try to redirect
                         if (response.ok) {
-                            response.json().then(function(data) {
-                                // Break out of iframe by sending message to parent
-                                var redirectUrl = 'https://dashboard.dittomusic.com/users/start_jwt_session?action=signup&redirect=https://dashboard.dittomusic.com/subscriptions';
-                                
-                                // Method 1: Post message to parent window
-                                if (window.parent && window.parent !== window) {
-                                    window.parent.postMessage({
-                                        type: 'OPEN_URL',
-                                        url: redirectUrl
-                                    }, '*');
-                                }
-                                
-                                // Method 2: Also try direct open as fallback
-                                setTimeout(function() {
-                                    window.open(redirectUrl, '_blank', 'noopener,noreferrer');
-                                }, 100);
-                            }).catch(function(parseError) {
-                                // Even if parse fails, still logged competition entry
-                                console.log('Response parse error, but competition entry succeeded');
-                            });
+                            console.log('Ditto account created successfully');
                         } else {
-                            // Log but don't show error to user since competition entry succeeded
                             console.log('Ditto API returned non-OK status, but competition entry succeeded');
                         }
                     }).catch(function(error) {
