@@ -389,13 +389,13 @@
             </p>
             <div style="background: rgba(0,255,153,0.15); border: 2px solid rgba(0,255,153,0.4); border-radius: 12px; padding: 12px; margin-top: 16px;">
                 <p style="font-family: 'Satoshi', sans-serif; font-size: 13px; color: rgba(255,255,255,0.85); margin: 0; margin-bottom: 16px;">
-                    🎸 Good luck! Click below to create your free Ditto account and get 30% off.
+                    🎸 Good luck! Your dashboard is opening now...
                 </p>
-                <a href="https://dashboard.dittomusic.com/signup" 
+                <a href="https://dashboard.dittomusic.com/users/start_jwt_session?action=signup&redirect=https://dashboard.dittomusic.com/subscriptions" 
                    target="_blank" 
                    rel="noopener noreferrer"
                    style="display: inline-block; width: 100%; padding: 14px 24px; background: linear-gradient(135deg, #823FF3 0%, #3928ED 100%); color: white; text-decoration: none; border-radius: 100px; font-weight: 700; font-size: 15px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; box-shadow: 0 4px 15px rgba(130, 63, 243, 0.4);">
-                    Create Ditto Account →
+                    Go to Dashboard →
                 </a>
             </div>
         </div>
@@ -412,11 +412,7 @@
             id="wf-form-Sign-Up" 
             name="wf-form-Sign-Up" 
             data-name="Sign Up"
-            action="https://dashboard2.dittomusic.com/api/users"
-            method="post"
             class="g-recaptcha-custom"
-            redirect="https://dashboard.dittomusic.com/users/start_jwt_session?action=signup&redirect=https://dashboard.dittomusic.com/subscriptions"
-            data-redirect="https://dashboard.dittomusic.com/users/start_jwt_session?action=signup&redirect=https://dashboard.dittomusic.com/subscriptions"
             aria-label="Sign Up">
             
             <div class="form-group">
@@ -581,12 +577,40 @@
                         mailchimpForm.submit();
                     }
                     
-                    // Show success immediately for competition
-                    dittoForm.style.display = 'none';
-                    formHeading.style.display = 'none';
-                    successMessage.style.display = 'block';
+                    // Submit to Ditto API via fetch (no form action to prevent navigation)
+                    const formData = new FormData(dittoForm);
                     
-                    console.log('✅ Competition entry complete! User can create Ditto account via the button.');
+                    fetch('https://dashboard2.dittomusic.com/api/users', {
+                        method: 'POST',
+                        body: formData
+                    }).then(function(response) {
+                        console.log('Ditto API response status:', response.status);
+                        return response.text();
+                    }).then(function(text) {
+                        console.log('Ditto API response:', text);
+                        
+                        // Show success regardless (competition entry is in Google Sheets)
+                        dittoForm.style.display = 'none';
+                        formHeading.style.display = 'none';
+                        successMessage.style.display = 'block';
+                        
+                        // Auto-open dashboard in new tab via parent window
+                        setTimeout(function() {
+                            var redirectUrl = 'https://dashboard.dittomusic.com/users/start_jwt_session?action=signup&redirect=https://dashboard.dittomusic.com/subscriptions';
+                            if (window.parent && window.parent !== window) {
+                                window.parent.postMessage({
+                                    type: 'OPEN_URL',
+                                    url: redirectUrl
+                                }, '*');
+                            }
+                        }, 1000);
+                    }).catch(function(error) {
+                        console.error('Ditto API error:', error);
+                        // Still show success for competition
+                        dittoForm.style.display = 'none';
+                        formHeading.style.display = 'none';
+                        successMessage.style.display = 'block';
+                    });
                 });
             }
             
