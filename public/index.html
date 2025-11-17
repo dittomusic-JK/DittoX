@@ -1772,18 +1772,24 @@
                                     const plotB = parseInt(b.tableNumber) || 999;
                                     return plotA - plotB;
                                 })
-                                .map(({exhibitor, tableNumber, url, hasUrl, brandName, description}) => `
-                                    <${hasUrl ? `a href="${url}" target="_blank" rel="noopener noreferrer"` : 'div'} class="card brand-item" 
+                                .map(({exhibitor, tableNumber, url, hasUrl, brandName, description}) => {
+                                    // Escape quotes and special chars for safe HTML insertion
+                                    const safeName = (exhibitor.fieldData?.name || 'Brand').replace(/["'`]/g, '');
+                                    const safeDesc = description.replace(/["'`]/g, '');
+                                    const safeUrl = url || '#';
+                                    
+                                    return `
+                                    <${hasUrl ? `a href="${safeUrl}" target="_blank" rel="noopener noreferrer"` : 'div'} class="card brand-item" 
                                          style="border: 1px solid rgba(0, 255, 153, 0.3); cursor: ${hasUrl ? 'pointer' : 'default'}; text-decoration: none; display: block; margin-bottom: 12px;"
-                                         data-name="${(exhibitor.fieldData?.name || '').toLowerCase()}"
+                                         data-name="${safeName.toLowerCase()}"
                                          data-booth="${String(tableNumber || '').toLowerCase()}">
                                         ${getImageUrl(exhibitor, 'logo') || getImageUrl(exhibitor) ? `
                                             <img src="${getImageUrl(exhibitor, 'logo') || getImageUrl(exhibitor)}" 
-                                                 class="sponsor-img" alt="${exhibitor.fieldData?.name || 'Exhibitor'}"
+                                                 class="sponsor-img" alt="${safeName}"
                                                  style="height: 100px; object-fit: contain; background: rgba(255,255,255,0.05); padding: 12px;">
                                         ` : ''}
                                         <div class="text-white" style="font-weight: 700; font-size: 16px; margin-bottom: 6px;">
-                                            ${exhibitor.fieldData?.name || 'Brand'}
+                                            ${safeName}
                                         </div>
                                         ${tableNumber ? `
                                             <div class="text-grey" style="font-size: 13px; font-weight: 600; margin-bottom: 6px;">
@@ -1792,12 +1798,11 @@
                                         ` : ''}
                                         ${description ? `
                                             <p class="text-grey" style="font-size: 12px; margin-top: 8px; line-height: 1.5;">
-                                                ${description.substring(0, 120)}${description.length > 120 ? '...' : ''}
+                                                ${safeDesc.substring(0, 120)}${safeDesc.length > 120 ? '...' : ''}
                                             </p>
                                         ` : ''}
                                     </${hasUrl ? 'a' : 'div'}>
-                                `;
-                                }).join('')
+                                `;}).join('')
                                 : `
                                 ${createLoadingHTML('Loading exhibitors')}
                             `}
