@@ -2642,6 +2642,14 @@
             });
         }
         
+        // Listen for messages from signup form iframe
+        window.addEventListener('message', function(event) {
+            // Handle OPEN_URL message from signup form
+            if (event.data && event.data.type === 'OPEN_URL' && event.data.url) {
+                window.open(event.data.url, '_blank', 'noopener,noreferrer');
+            }
+        });
+        
         init();
     </script>
 </body>
