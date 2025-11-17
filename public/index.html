@@ -7,6 +7,7 @@
     
     <!-- PWA Meta Tags -->
     <meta name="description" content="Official digital programme for Ditto X 2025 at The O2 Arena, London">
+    <meta name="robots" content="noindex, nofollow">
     <meta name="theme-color" content="#00ff99">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1032,7 +1033,8 @@
                 return null;
             }
             
-            return type;
+            // Capitalize first letter
+            return type.charAt(0).toUpperCase() + type.slice(1);
         }
 
         // Format time from various possible formats
@@ -1736,7 +1738,8 @@
                         </p>
                         <div id="brandsList">
                             ${webflowData.exhibitors && webflowData.exhibitors.length > 0 ? 
-                                webflowData.exhibitors.map(exhibitor => {
+                                webflowData.exhibitors
+                                .map(exhibitor => {
                                     const url = exhibitor.fieldData?.link || exhibitor.fieldData?.url || exhibitor.fieldData?.website;
                                     const hasUrl = url && url !== '#';
                                     // Plot number mapping from venue
@@ -1760,7 +1763,16 @@
                                     const brandName = exhibitor.fieldData?.name || '';
                                     const tableNumber = plotMapping[brandName] || exhibitor.fieldData?.['table-number'] || exhibitor.fieldData?.booth || '';
                                     const description = exhibitor.fieldData?.['short-bio'] || exhibitor.fieldData?.description || '';
-                                    return `
+                                    // Store plot number for sorting
+                                    return { exhibitor, tableNumber, url, hasUrl, brandName, description };
+                                })
+                                .sort((a, b) => {
+                                    // Sort by plot number (numeric)
+                                    const plotA = parseInt(a.tableNumber) || 999;
+                                    const plotB = parseInt(b.tableNumber) || 999;
+                                    return plotA - plotB;
+                                })
+                                .map(({exhibitor, tableNumber, url, hasUrl, brandName, description}) => `
                                     <${hasUrl ? `a href="${url}" target="_blank" rel="noopener noreferrer"` : 'div'} class="card brand-item" 
                                          style="border: 1px solid rgba(0, 255, 153, 0.3); cursor: ${hasUrl ? 'pointer' : 'default'}; text-decoration: none; display: block; margin-bottom: 12px;"
                                          data-name="${(exhibitor.fieldData?.name || '').toLowerCase()}"

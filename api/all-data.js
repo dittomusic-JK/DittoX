@@ -55,6 +55,9 @@ module.exports = async (req, res) => {
         const exhibitorsCollection = collections.find(c => 
             c.displayName?.toLowerCase().includes('exhibitor') || c.slug?.toLowerCase().includes('exhibitor')
         );
+        const typesCollection = collections.find(c => 
+            c.displayName?.toLowerCase().includes('typ') || c.slug?.toLowerCase().includes('typ')
+        );
         
         console.log('✅ MATCHED COLLECTIONS:');
         console.log('  Speakers:', speakersCollection?.displayName || 'NOT FOUND');
@@ -62,9 +65,10 @@ module.exports = async (req, res) => {
         console.log('  Sponsors:', sponsorsCollection?.displayName || 'NOT FOUND');
         console.log('  Stages:', stagesCollection?.displayName || 'NOT FOUND');
         console.log('  Exhibitors:', exhibitorsCollection?.displayName || 'NOT FOUND');
+        console.log('  Types:', typesCollection?.displayName || 'NOT FOUND');
 
         // Fetch all collections in parallel
-        const [speakers, scheduleItems, sponsors, stagesList, exhibitors] = await Promise.all([
+        const [speakers, scheduleItems, sponsors, stagesList, exhibitors, typesList] = await Promise.all([
             speakersCollection ? 
                 fetch(`${WEBFLOW_CONFIG.baseUrl}/collections/${speakersCollection.id}/items`, { headers })
                     .then(r => r.json()).then(d => d.items || []) : 
@@ -92,6 +96,10 @@ module.exports = async (req, res) => {
             exhibitorsCollection ? 
                 fetch(`${WEBFLOW_CONFIG.baseUrl}/collections/${exhibitorsCollection.id}/items`, { headers })
                     .then(r => r.json()).then(d => d.items || []) : 
+                Promise.resolve([]),
+            typesCollection ? 
+                fetch(`${WEBFLOW_CONFIG.baseUrl}/collections/${typesCollection.id}/items`, { headers })
+                    .then(r => r.json()).then(d => d.items || []) : 
                 Promise.resolve([])
         ]);
 
@@ -104,6 +112,11 @@ module.exports = async (req, res) => {
         const speakersMap = {};
         speakers.forEach(speaker => {
             speakersMap[speaker.id] = speaker.fieldData?.name || 'Unknown Speaker';
+        });
+
+        const typesMap = {};
+        typesList.forEach(type => {
+            typesMap[type.id] = type.fieldData?.name || type.fieldData?.typ || 'Unknown Type';
         });
 
         // Filter schedule for MTMI: 25 and enhance with resolved names
@@ -129,12 +142,20 @@ module.exports = async (req, res) => {
                         .join(', ');
                 }
                 
+                // Resolve type name from ID
+                if (fields.typ) {
+                    enhanced.typeName = typesMap[fields.typ] || null;
+                } else if (fields.type) {
+                    enhanced.typeName = typesMap[fields.type] || null;
+                }
+                
                 return enhanced;
             });
 
         console.log(`📅 SCHEDULE: Found ${scheduleItems.length} total items, filtered to ${schedule.length} MTMI: 25 items`);
         console.log(`🎪 STAGES: Loaded ${Object.keys(stagesMap).length} stages`);
         console.log(`🎤 SPEAKERS: Loaded ${Object.keys(speakersMap).length} speakers`);
+        console.log(`🏷️  TYPES: Loaded ${Object.keys(typesMap).length} types`);
         console.log(`🏢 EXHIBITORS: Loaded ${exhibitors.length} exhibitors`);
 
         res.status(200).json({
