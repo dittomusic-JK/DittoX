@@ -117,7 +117,11 @@
         .custom-g-recaptcha-form-wrapper input[type="password"]:focus ~ .floating-label,
         .custom-g-recaptcha-form-wrapper input[type="password"]:not(:placeholder-shown) ~ .floating-label,
         .custom-g-recaptcha-form-wrapper input[type="password"]:focus ~ .field-label-8,
-        .custom-g-recaptcha-form-wrapper input[type="password"]:not(:placeholder-shown) ~ .field-label-8 {
+        .custom-g-recaptcha-form-wrapper input[type="password"]:not(:placeholder-shown) ~ .field-label-8,
+        .custom-g-recaptcha-form-wrapper input[type="text"]:focus ~ .floating-label,
+        .custom-g-recaptcha-form-wrapper input[type="text"]:not(:placeholder-shown) ~ .floating-label,
+        .custom-g-recaptcha-form-wrapper input[type="text"]:focus ~ .field-label-8,
+        .custom-g-recaptcha-form-wrapper input[type="text"]:not(:placeholder-shown) ~ .field-label-8 {
             top: -10px !important;
             left: 12px !important;
             font-size: 11px !important;
@@ -155,7 +159,8 @@
 
         /* Hide placeholder initially, show when focused */
         .custom-g-recaptcha-form-wrapper input[type="email"]::placeholder,
-        .custom-g-recaptcha-form-wrapper input[type="password"]::placeholder {
+        .custom-g-recaptcha-form-wrapper input[type="password"]::placeholder,
+        .custom-g-recaptcha-form-wrapper input[type="text"]::placeholder {
             opacity: 0 !important;
         }
 
@@ -594,54 +599,37 @@
                         method: 'POST',
                         body: formData
                     }).then(function(response) {
+                        // Always show success message (competition entry is what matters)
+                        dittoForm.style.display = 'none';
+                        formHeading.style.display = 'none';
+                        successMessage.style.display = 'block';
+                        
+                        // Try to parse response and open dashboard if successful
                         if (response.ok) {
-                            // Show success message
-                            dittoForm.style.display = 'none';
-                            formHeading.style.display = 'none';
-                            successMessage.style.display = 'block';
-                            
-                            // Open Ditto dashboard in new tab
-                            var redirectUrl = 'https://dashboard.dittomusic.com/users/start_jwt_session?action=signup&redirect=https://dashboard.dittomusic.com/subscriptions';
-                            window.open(redirectUrl, '_blank');
+                            response.json().then(function(data) {
+                                // Open Ditto dashboard in new tab
+                                var redirectUrl = 'https://dashboard.dittomusic.com/users/start_jwt_session?action=signup&redirect=https://dashboard.dittomusic.com/subscriptions';
+                                window.open(redirectUrl, '_blank', 'noopener,noreferrer');
+                            }).catch(function(parseError) {
+                                // Even if parse fails, still logged competition entry
+                                console.log('Response parse error, but competition entry succeeded');
+                            });
                         } else {
-                            console.error('Signup failed:', response);
-                            alert('Signup failed. Please try again.');
+                            // Log but don't show error to user since competition entry succeeded
+                            console.log('Ditto API returned non-OK status, but competition entry succeeded');
                         }
                     }).catch(function(error) {
-                        console.error('Signup error:', error);
-                        alert('An error occurred. Please try again.');
+                        // Log but don't show error to user since competition entry succeeded
+                        console.log('Ditto API error, but competition entry succeeded:', error);
+                        // Still show success for competition
+                        dittoForm.style.display = 'none';
+                        formHeading.style.display = 'none';
+                        successMessage.style.display = 'block';
                     });
                 });
             }
             
-            // Listen for successful form submission and force redirect to break out of iframe
-            window.addEventListener('message', function(event) {
-                // Check if message is from Ditto dashboard indicating success
-                if (event.data && (event.data.success || event.data.redirect)) {
-                    var redirectUrl = dittoForm.getAttribute('redirect') || dittoForm.getAttribute('data-redirect');
-                    if (redirectUrl) {
-                        // Force parent window to redirect
-                        window.top.location.href = redirectUrl;
-                    }
-                }
-            });
-            
-            // Alternative: Intercept form submission result
-            var originalFetch = window.fetch;
-            window.fetch = function() {
-                return originalFetch.apply(this, arguments).then(function(response) {
-                    // If this is the Ditto API call and it succeeds, force redirect
-                    if (response.ok && arguments[0].includes('dashboard2.dittomusic.com')) {
-                        setTimeout(function() {
-                            var redirectUrl = dittoForm.getAttribute('redirect') || dittoForm.getAttribute('data-redirect');
-                            if (redirectUrl) {
-                                window.top.location.href = redirectUrl;
-                            }
-                        }, 500);
-                    }
-                    return response;
-                });
-            }
+            // Removed conflicting redirect code - using window.open in fetch handler above
         });
     </script>
 </body>
