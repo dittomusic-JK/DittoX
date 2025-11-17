@@ -607,9 +607,27 @@
                         // Try to parse response and open dashboard if successful
                         if (response.ok) {
                             response.json().then(function(data) {
-                                // Open Ditto dashboard in new tab
+                                // Break out of iframe and open dashboard in new tab/window
                                 var redirectUrl = 'https://dashboard.dittomusic.com/users/start_jwt_session?action=signup&redirect=https://dashboard.dittomusic.com/subscriptions';
-                                window.open(redirectUrl, '_blank', 'noopener,noreferrer');
+                                
+                                // Try multiple methods to break out of iframe
+                                try {
+                                    // Method 1: Try to open in parent's new tab
+                                    if (window.top && window.top !== window) {
+                                        window.top.open(redirectUrl, '_blank');
+                                    } else {
+                                        window.open(redirectUrl, '_blank');
+                                    }
+                                } catch (e) {
+                                    // If blocked by popup blocker or security, create a link and click it
+                                    var a = document.createElement('a');
+                                    a.href = redirectUrl;
+                                    a.target = '_blank';
+                                    a.rel = 'noopener noreferrer';
+                                    document.body.appendChild(a);
+                                    a.click();
+                                    document.body.removeChild(a);
+                                }
                             }).catch(function(parseError) {
                                 // Even if parse fails, still logged competition entry
                                 console.log('Response parse error, but competition entry succeeded');
