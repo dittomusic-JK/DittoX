@@ -1094,6 +1094,27 @@
                 .map(id => webflowData.speakers.find(s => s.id === id))
                 .filter(s => s);
         }
+        
+        // Toggle speaker bio expansion
+        function toggleBio(bioId) {
+            const shortText = document.getElementById(`${bioId}-short`);
+            const fullText = document.getElementById(`${bioId}-full`);
+            const button = document.getElementById(`${bioId}-btn`);
+            
+            if (!shortText || !fullText || !button) return;
+            
+            const isExpanded = fullText.style.display !== 'none';
+            
+            if (isExpanded) {
+                shortText.style.display = 'inline';
+                fullText.style.display = 'none';
+                button.textContent = 'Read more';
+            } else {
+                shortText.style.display = 'none';
+                fullText.style.display = 'inline';
+                button.textContent = 'Read less';
+            }
+        }
 
         // Show session detail page
         function showSessionDetail(sessionId) {
@@ -1144,7 +1165,13 @@
                         ${speakers.length > 0 ? `
                             <h2 style="font-size: 24px; margin-bottom: 16px; color: white; font-family: 'Neusa', sans-serif;">Speakers</h2>
                             <div style="display: grid; gap: 16px;">
-                                ${speakers.map(speaker => `
+                                ${speakers.map((speaker, speakerIndex) => {
+                                    const bio = speaker.fieldData?.['bio-2'] || '';
+                                    const isTruncated = bio.length > 300;
+                                    const truncatedBio = isTruncated ? bio.substring(0, 300) : bio;
+                                    const bioId = `bio-${speaker.id}`;
+                                    
+                                    return `
                                     <div class="card no-arrow" style="cursor: default;">
                                         <div style="display: flex; gap: 16px; align-items: start;">
                                             ${getImageUrl(speaker, 'profile-pic') ? `
@@ -1170,10 +1197,21 @@
                                                          style="max-height: 30px; max-width: 150px; width: auto; height: auto; object-fit: contain; margin-bottom: 12px;"
                                                          alt="Company Logo">
                                                 ` : ''}
-                                                ${speaker.fieldData?.['bio-2'] ? `
-                                                    <p class="text-grey" style="font-size: 13px; line-height: 1.6; margin-bottom: 12px;">
-                                                        ${speaker.fieldData['bio-2'].length > 300 ? speaker.fieldData['bio-2'].substring(0, 300) + '...' : speaker.fieldData['bio-2']}
-                                                    </p>
+                                                ${bio ? `
+                                                    <div>
+                                                        <p class="text-grey" id="${bioId}" style="font-size: 13px; line-height: 1.6; margin-bottom: ${isTruncated ? '8px' : '12px'};">
+                                                            <span id="${bioId}-short">${truncatedBio}${isTruncated ? '...' : ''}</span>
+                                                            ${isTruncated ? `<span id="${bioId}-full" style="display: none;">${bio}</span>` : ''}
+                                                        </p>
+                                                        ${isTruncated ? `
+                                                            <button onclick="toggleBio('${bioId}')" id="${bioId}-btn" 
+                                                                    style="background: none; border: none; color: #00ff99; font-weight: 600; 
+                                                                           font-size: 13px; cursor: pointer; padding: 0; margin-bottom: 12px; 
+                                                                           text-decoration: underline; font-family: 'Satoshi', sans-serif;">
+                                                                Read more
+                                                            </button>
+                                                        ` : ''}
+                                                    </div>
                                                 ` : ''}
                                                 ${(speaker.fieldData?.linkedin || speaker.fieldData?.twitter || speaker.fieldData?.spotify) ? `
                                                     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
@@ -1218,7 +1256,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                `).join('')}
+                                `;
+                                }).join('')}
                             </div>
                         ` : ''}
                     </div>
