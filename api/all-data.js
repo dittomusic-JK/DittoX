@@ -111,7 +111,10 @@ module.exports = async (req, res) => {
 
         const speakersMap = {};
         speakers.forEach(speaker => {
-            speakersMap[speaker.id] = speaker.fieldData?.name || 'Unknown Speaker';
+            speakersMap[speaker.id] = {
+                name: speaker.fieldData?.name || 'Unknown Speaker',
+                company: speaker.fieldData?.['company-text'] || speaker.fieldData?.company || null
+            };
         });
 
         const typesMap = {};
@@ -134,10 +137,17 @@ module.exports = async (req, res) => {
                     enhanced.stageName = stagesMap[fields.stages] || enhanced.stageName || 'Main Stage';
                 }
                 
-                // Resolve speaker names from IDs
+                // Resolve speaker names from IDs (with company text for schedule feed)
                 if (fields['speakers-2'] && Array.isArray(fields['speakers-2'])) {
                     enhanced.speakerNames = fields['speakers-2']
-                        .map(id => speakersMap[id])
+                        .map(id => {
+                            const speaker = speakersMap[id];
+                            if (!speaker) return null;
+                            if (speaker.company) {
+                                return `${speaker.name} (${speaker.company})`;
+                            }
+                            return speaker.name;
+                        })
                         .filter(name => name)
                         .join(', ');
                 }
