@@ -1,9 +1,9 @@
 // Ditto X 25 - Service Worker
-// Version 1.1.0
+// Version 1.2.0
 
-const CACHE_VERSION = 'dittox25-v1.1.0';
-const API_CACHE = 'dittox25-api-v1.1.0';
-const IMAGE_CACHE = 'dittox25-images-v1.1.0';
+const CACHE_VERSION = 'dittox25-v1.2.0';
+const API_CACHE = 'dittox25-api-v1.2.0';
+const IMAGE_CACHE = 'dittox25-images-v1.2.0';
 
 // Files to cache immediately on install
 const STATIC_ASSETS = [
