@@ -1082,16 +1082,17 @@
             });
         }
 
-        // Get upcoming sessions (next 3 sessions that haven't started yet)
+        // Get upcoming sessions (next 3 sessions that haven't started yet or happening now)
         function getUpcomingSessions() {
             const now = new Date().getTime();
             const sorted = getSortedSchedule();
             
-            // Find sessions that haven't started yet or are happening now (within 2 hours)
+            // Find sessions that are happening now or coming up soon
+            // "Happening now" = started within last 30 minutes
             const upcoming = sorted.filter(session => {
                 const sessionTime = getTimeStamp(session.fieldData?.time);
-                // Show if session is in the future or started within the last 2 hours
-                return sessionTime > (now - 2 * 60 * 60 * 1000);
+                // Show if session started within the last 30 minutes or is in the future
+                return sessionTime > (now - 30 * 60 * 1000);
             });
             
             return upcoming.slice(0, 3);
@@ -2136,7 +2137,7 @@
                 clearInterval(upNextInterval);
             }
             
-            // Refresh Up Next section every 45 minutes (45 * 60 * 1000 ms)
+            // Refresh Up Next section every 5 minutes to keep it current
             upNextInterval = setInterval(() => {
                 console.log('🔄 Refreshing Up Next sessions...');
                 const currentPage = document.querySelector('.nav-btn.active')?.getAttribute('data-page');
@@ -2144,9 +2145,9 @@
                 if (currentPage === 'welcome') {
                     show('welcome');
                 }
-            }, 45 * 60 * 1000); // 45 minutes
+            }, 5 * 60 * 1000); // 5 minutes
             
-            console.log('⏰ Up Next will refresh every 45 minutes');
+            console.log('⏰ Up Next will refresh every 5 minutes');
         }
 
         function filterSchedule() {
